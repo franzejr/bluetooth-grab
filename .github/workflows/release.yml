@@ -1,0 +1,49 @@
+name: Release
+
+# Build "Bluetooth Grab.app" and publish a GitHub Release on every commit to
+# main. Each run creates an auto-incrementing tag (v1.0.<run number>).
+on:
+  push:
+    branches:
+      - main
+    # Only cut a release when something that affects the built app changes —
+    # docs-only commits (README, LICENSE) don't trigger a build.
+    paths:
+      - bluetooth-grab.sh
+      - build-app.sh
+      - make-icon.swift
+      - .github/workflows/release.yml
+
+permissions:
+  contents: write  # needed to create the tag, release, and upload assets
+
+# Avoid overlapping release runs if commits land in quick succession.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Generate the app icon
+        run: |
+          swift make-icon.swift AppIcon.iconset
+          iconutil -c icns AppIcon.iconset
+
+      - name: Build Bluetooth Grab.app
+        run: bash build-app.sh
+
+      - name: Zip the app
+        run: ditto -c -k --keepParent "Bluetooth Grab.app" "Bluetooth-Grab.zip"
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: v1.0.${{ github.run_number }}
+          files: Bluetooth-Grab.zip
+          generate_release_notes: true
