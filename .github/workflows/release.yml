@@ -31,6 +31,7 @@ jobs:
 
       - name: Generate the app icon
         run: |
+          mkdir -p AppIcon.iconset
           swift make-icon.swift AppIcon.iconset
           iconutil -c icns AppIcon.iconset
 
