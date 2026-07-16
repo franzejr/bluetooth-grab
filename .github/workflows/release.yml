@@ -9,7 +9,9 @@ on:
     # Only cut a release when something that affects the built app changes —
     # docs-only commits (README, LICENSE) don't trigger a build.
     paths:
-      - bluetooth-grab.sh
+      - Package.swift
+      - Sources/**
+      - Tests/**
       - build-app.sh
       - make-icon.swift
       - .github/workflows/release.yml
@@ -28,6 +30,9 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+
+      - name: Run tests
+        run: swift test
 
       - name: Generate the app icon
         run: |

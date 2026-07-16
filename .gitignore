@@ -2,3 +2,6 @@
 Bluetooth Grab.app/
 AppIcon.icns
 AppIcon.iconset/
+
+# Swift build output
+.build/
