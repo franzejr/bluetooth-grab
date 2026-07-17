@@ -2,7 +2,7 @@
 
 Move a Bluetooth device — a Magic Keyboard, trackpad, mouse, headphones, or any other paired peripheral — **onto the Mac in front of you** with a single toggle. 🖱️⌨️🎧
 
-When you share a Bluetooth peripheral between two Macs, switching it over normally means navigating System Settings or toggling the device's power switch by hand. Bluetooth Grab is a small app with a window of your paired devices and an on/off switch next to each one: flip it on to grab the device onto this Mac, flip it off to release it for the other Mac. ✨
+When you share a Bluetooth peripheral between two Macs, switching it over normally means navigating System Settings or toggling the device's power switch by hand. **Bluetooth Grab is a native macOS app** — a window of your paired devices, each with an on/off switch: flip it on to grab the device onto this Mac, flip it off to release it for the other Mac. It stays open, and the switches track each device's live connection state. ✨
 
 > **Mac-to-Mac only.** Run it on the Mac you want the device to connect **to**.
 > Works with any paired device, not just Apple peripherals.
