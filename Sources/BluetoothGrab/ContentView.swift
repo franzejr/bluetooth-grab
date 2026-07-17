@@ -34,14 +34,14 @@ struct ContentView: View {
       Text("\(model.pendingRelease?.displayName ?? "This device") looks like the one you're using. Releasing it disconnects it from this Mac.")
     }
     .confirmationDialog(
-      "Reset pairing?",
-      isPresented: resetConfirmationBinding,
+      "Force grab?",
+      isPresented: forceGrabConfirmationBinding,
       titleVisibility: .visible
     ) {
-      Button("Reset pairing", role: .destructive) { model.confirmReset() }
-      Button("Cancel", role: .cancel) { model.cancelReset() }
+      Button("Force grab", role: .destructive) { model.confirmForceGrab() }
+      Button("Cancel", role: .cancel) { model.cancelForceGrab() }
     } message: {
-      Text("This removes \(model.pendingReset?.displayName ?? "the device")'s pairing from this Mac and re-pairs it. Use it only when a normal grab won't connect. The device must be in pairing mode — flick its power switch off/on first.")
+      Text("This unpairs \(model.pendingForceGrab?.displayName ?? "the device") and re-pairs it from scratch. Use it only when a normal grab won't connect. The device must be in pairing mode — flick its power switch off/on first. If the re-pair fails, the device drops off the list until you pair it again in System Settings.")
     }
   }
 
@@ -106,10 +106,10 @@ struct ContentView: View {
     )
   }
 
-  private var resetConfirmationBinding: Binding<Bool> {
+  private var forceGrabConfirmationBinding: Binding<Bool> {
     Binding(
-      get: { model.pendingReset != nil },
-      set: { if !$0 { model.cancelReset() } }
+      get: { model.pendingForceGrab != nil },
+      set: { if !$0 { model.cancelForceGrab() } }
     )
   }
 }
@@ -135,7 +135,7 @@ struct DeviceRow: View {
         ProgressView().controlSize(.small)
       }
       Menu {
-        Button("Reset pairing…") { model.requestReset(device) }
+        Button("Force grab…") { model.requestForceGrab(device) }
       } label: {
         Image(systemName: "ellipsis.circle")
       }

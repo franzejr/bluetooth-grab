@@ -147,24 +147,24 @@ final class BlueutilClientTests: XCTestCase {
                    "must never unpair — that would strip the device from this Mac")
   }
 
-  // MARK: - Reset pairing
+  // MARK: - Force grab
 
-  func testResetPairingUnpairsThenRepairsAndConnects() {
+  func testForceGrabUnpairsThenRepairsAndConnects() {
     let fake = FakeBluetooth()
     fake.connectableAfterPair = ["aa-bb"]  // only reconnects after a fresh pair
     let client = BlueutilClient(runner: fake, settle: {})
 
-    XCTAssertEqual(client.resetPairing("aa-bb"), .connected)
+    XCTAssertEqual(client.forceGrab("aa-bb"), .connected)
     XCTAssertEqual(fake.issuedCommands.filter { $0 == "--unpair" }.count, 1,
-                   "reset must clear the old bond exactly once")
+                   "force grab must clear the old bond exactly once")
     XCTAssertTrue(fake.issuedCommands.contains("--pair"))
   }
 
-  func testResetPairingFailsWhenDeviceNotInPairingMode() {
+  func testForceGrabFailsWhenDeviceNotInPairingMode() {
     let fake = FakeBluetooth()  // never connectable → not in pairing mode
     let client = BlueutilClient(runner: fake, settle: {})
 
-    XCTAssertEqual(client.resetPairing("aa-bb"), .failed)
+    XCTAssertEqual(client.forceGrab("aa-bb"), .failed)
   }
 
   // MARK: - Release

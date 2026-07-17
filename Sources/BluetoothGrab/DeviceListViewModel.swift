@@ -28,8 +28,8 @@ final class DeviceListViewModel: ObservableObject {
   /// Address of a device whose release needs confirming (the one you're using).
   @Published var pendingRelease: BluetoothDevice?
 
-  /// Device awaiting confirmation for a pairing reset (unpair is destructive).
-  @Published var pendingReset: BluetoothDevice?
+  /// Device awaiting confirmation for a force grab (unpair is destructive).
+  @Published var pendingForceGrab: BluetoothDevice?
 
   private let client: BlueutilClient
   private let pollInterval: Duration
@@ -114,33 +114,34 @@ final class DeviceListViewModel: ObservableObject {
     objectWillChange.send()
   }
 
-  // MARK: - Reset pairing
+  // MARK: - Force grab
 
-  /// Ask to reset a device's pairing — the recovery path for a stale/corrupt
-  /// bond. Because it unpairs, it always confirms first.
-  func requestReset(_ device: BluetoothDevice) {
+  /// Ask to force-grab a device — the aggressive unpair-and-repair path for a
+  /// device a normal grab can't connect. Because it unpairs, it always confirms
+  /// first (a failed force grab drops the device until it's re-paired).
+  func requestForceGrab(_ device: BluetoothDevice) {
     guard !busyAddresses.contains(device.address) else { return }
-    pendingReset = device
+    pendingForceGrab = device
   }
 
-  func confirmReset() {
-    guard let device = pendingReset else { return }
-    pendingReset = nil
-    reset(device)
+  func confirmForceGrab() {
+    guard let device = pendingForceGrab else { return }
+    pendingForceGrab = nil
+    forceGrab(device)
   }
 
-  func cancelReset() {
-    pendingReset = nil
+  func cancelForceGrab() {
+    pendingForceGrab = nil
   }
 
-  private func reset(_ device: BluetoothDevice) {
-    perform(device, verb: "Resetting", target: true) { client in
-      client.resetPairing(device.address) != .failed
+  private func forceGrab(_ device: BluetoothDevice) {
+    perform(device, verb: "Force-grabbing", target: true) { client in
+      client.forceGrab(device.address) != .failed
     }
     .onDone { [weak self] ok in
       self?.status = ok
-        ? "✓ \(device.displayName) — pairing reset and connected"
-        : "✗ \(device.displayName) — reset failed. Put the device in pairing mode (power switch off/on) and try again."
+        ? "✓ \(device.displayName) — force-grabbed and connected"
+        : "✗ \(device.displayName) — force grab failed. Put the device in pairing mode (power switch off/on), then re-pair it in System Settings if it's no longer listed."
     }
   }
 
@@ -149,7 +150,7 @@ final class DeviceListViewModel: ObservableObject {
       .onDone { [weak self] ok in
         self?.status = ok
           ? "✓ \(device.displayName) — connected"
-          : "✗ \(device.displayName) — couldn't grab. Release it on the other Mac (toggle it off there) or flick the device's power switch off/on, then try again."
+          : "✗ \(device.displayName) — couldn't grab. Toggle it on again to retry, or release it on the other Mac. Still stuck? Use ⋯ → Force grab."
       }
   }
 

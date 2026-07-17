@@ -103,23 +103,25 @@ struct BlueutilClient: Sendable {
     return .failed
   }
 
-  /// Forcibly reset a device's bond, then re-pair and connect.
+  /// Forcibly grab a device by tearing down its bond and re-pairing from
+  /// scratch: `--unpair`, then `--pair`, then connect.
   ///
-  /// This is the destructive recovery path for a stale or corrupt bond that a
-  /// plain `grab` can't fix (where `--connect` fails and `--pair` is a no-op
-  /// because a broken bond record already exists). Unlike `grab`, it *does*
-  /// `--unpair` — so it's only ever run on explicit user request, never
-  /// automatically. The device must be in pairing mode for the re-pair to take.
-  func resetPairing(_ address: String) -> GrabOutcome {
-    AppLog.log("reset \(address): unpairing")
+  /// This is the aggressive path for a device a normal `grab` can't connect —
+  /// a stale or corrupt bond where `--connect` fails and `--pair` is a no-op
+  /// because a broken bond record already exists. Unlike `grab`, it *does*
+  /// `--unpair` — which strips the pairing if the re-pair then fails — so it's
+  /// only ever run on explicit user request, never automatically. The device
+  /// must be in pairing mode for the re-pair to take.
+  func forceGrab(_ address: String) -> GrabOutcome {
+    AppLog.log("force-grab \(address): unpairing")
     _ = runner.run(blueutilPath, arguments: ["--unpair", address])
     settle()
     _ = runner.run(blueutilPath, arguments: ["--pair", address])
     if connectAndVerify(address) {
-      AppLog.log("reset \(address): connected")
+      AppLog.log("force-grab \(address): connected")
       return .connected
     }
-    AppLog.log("reset \(address): FAILED (put the device in pairing mode and retry)")
+    AppLog.log("force-grab \(address): FAILED (put the device in pairing mode and retry)")
     return .failed
   }
 

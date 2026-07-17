@@ -16,9 +16,14 @@ enum AppLog {
     return dir.appendingPathComponent("last-run.log")
   }
 
+  /// True when running inside a test bundle — the XCTest framework is only
+  /// loaded into the test host, never the shipping app. (`swift test` doesn't
+  /// set XCTestConfigurationFilePath, so we detect the loaded class instead.)
+  private static let isRunningTests = NSClassFromString("XCTestCase") != nil
+
   static func log(_ message: String) {
     // Don't pollute the real log file when running under XCTest.
-    if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return }
+    if isRunningTests { return }
 
     let stamped = "\(timestamp())  \(message)\n"
     queue.async {

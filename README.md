@@ -86,9 +86,11 @@ An Apple peripheral (Magic Keyboard and friends) stores only **one** host bond a
 
 A normal grab never *unpairs* a device, so a failed grab never strips the device from this Mac — worst case, the switch just stays off and the status line tells you what to do.
 
-### Reset pairing (last resort)
+### Force grab (last resort)
 
-If a device is genuinely stuck — a stale or corrupt bond that a normal grab can't connect no matter what — open the **⋯** menu on that device's row and choose **Reset pairing…**. This removes the bond from this Mac and re-pairs from scratch. Because it unpairs, it asks for confirmation first, and the device has to be in pairing mode (power switch off/on) for it to take. Use it only when the plain toggle won't connect.
+A normal grab (the toggle) tries a plain connect, then a re-pair — both non-destructive, so a device that won't connect just stays in the list and you can toggle it again to retry.
+
+If a device is genuinely stuck — a stale or corrupt bond that no amount of retrying connects — open the **⋯** menu on that device's row and choose **Force grab…**. This unpairs the device and re-pairs it from scratch. Because it unpairs, it asks for confirmation first, and the device has to be in pairing mode (power switch off/on) for it to take. If the re-pair fails, the device drops off the list until you pair it again in System Settings — so it's a deliberate last resort, not the everyday path.
 
 ---
 
